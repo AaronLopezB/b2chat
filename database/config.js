@@ -1,18 +1,38 @@
-const mongoose = require('mongoose');
+const mysql = require('mysql2/promise'); // Corrección aquí
 
-const dbConnection = async () => {
+const pool = mysql.createPool({
+    host: process.env.DATABASE_HOST,
+    port: Number(process.env.DATABASE_PORT || 3306),
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASS,
+    database: process.env.DATABASE_NAME,
+    waitForConnections: true,
+    connectionLimit: Number(process.env.DATABASE_CONN_LIMIT || 10),
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+    connectTimeout: 15_000,
+    multipleStatements: false,
+});
+
+// Asegúrate de tener logger definido antes de usarlo
+pool.on('connection', async (conn) => {
+    // logger.info('[DB] Conexión creada en el pool');
+    console.log('Conexión creada en el pool');
+
     try {
-        await mongoose.connect(process.env.MONGODB_CNN, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log('DB Online');
-    } catch (error) {
-        console.log(`Error connecting to the database: ${error}`);
-        throw new Error('Error connecting to the database', error);
-    }
-}
+        const p = conn.promise();
+        await p.query('SET SESSION wait_timeout = 600');
+        await p.query('SET SESSION interactive_timeout = 600');
+    } catch (e) {
+        console.log('[DB] No se pudo ajustar timeouts de sesión', { error: e.code || e.message });
 
-module.exports = {
-    dbConnection
-}
+        // logger.warn('[DB] No se pudo ajustar timeouts de sesión', { error: e.code || e.message });
+    }
+});
+setInterval(async () => {
+    try { const c = await pool.getConnection(); await c.ping(); c.release(); }
+    catch (e) { logger.warn('[DB] Ping falló', { error: e.code || e.message }); }
+}, 60_000);
+
+module.exports = { pool };

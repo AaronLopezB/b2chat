@@ -1,17 +1,17 @@
 const axios = require('axios');
 const qs = require('qs');
-const session = require('express-session');
+// const session = require('express-session');
 
 class authService {
     constructor() {
         this.apiclient = process.env.B2CHAT_API_BASE_URL;
         this.apiclientuser = process.env.B2CHAT_API_USER;
         this.apiclientpassword = process.env.B2CHAT_API_PASSWORD;
-        this.accesstoken = sessionStorage.getItem('access_token') || null;
-        this.tokenExpiry = sessionStorage.getItem('token_expiry') || null;
+        // this.accesstoken = null;
+        // this.tokenExpiry = null;
     }
 
-    async getOAuthToken() {
+    async getOAuthToken(user) {
 
         try {
             const data = qs.stringify({
@@ -34,17 +34,18 @@ class authService {
                 }
             );
 
-            sessionStorage.setItem('access_token', response.data.access_token);
-            //  response.data.access_token;
-
-            // Calcular la fecha de expiración del token (actual + duración en segundos)
+            // // Calcular la fecha de expiración del token (actual + duración en segundos)
             const expiresIn = response.data.expires_in || 3600; // Valor por defecto de 1 hora si no se proporciona
             const tokenExpiry = Date.now() + (expiresIn * 1000) - 60000; // Restar 1 minuto para mayor seguridad
 
-            sessionStorage.setItem('token_expiry', tokenExpiry);
-            console.log('Authentication access');
+            const dataClient = {
+                b2chatToken: response.data.access_token,
+                tokenExpiresAt: new Date(tokenExpiry)
+            }
 
-            return this.accesstoken;
+            const userUpdated = await User.findByIdAndUpdate(user, dataClient, { new: true });
+
+            return userUpdated;
 
         } catch (error) {
             console.log(error);

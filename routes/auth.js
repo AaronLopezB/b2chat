@@ -1,9 +1,23 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 
-const { oauthToken } = require('../controller/auth');
+const { validateItems } = require('../middlewares/validate-items');
+
+const {
+    oauthToken,
+    registerUser
+} = require('../controller/auth');
+
 const router = Router();
 
-router.get('/oauth', [], oauthToken);
+router.post('/oauth', [
+    check('keyAccess', 'The la key acces is required').isEmail(),
+    // validateItems
+], oauthToken);
+
+router.post('/register', [
+    check('name', 'Name is required').not().isEmpty(),
+
+], registerUser);
 
 module.exports = router;
