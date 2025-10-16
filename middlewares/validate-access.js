@@ -1,20 +1,24 @@
 const { response, request } = require('express');
 
+const { queryPool } = require('../models/conexion')
 
 const validateAccess = async (req = request, res = response, next) => {
-    const token = req.header('x-auth-token');
-    if (!token) {
+
+    const { keyAccess } = req.body;
+
+    if (!keyAccess) {
         return res.status(401).json({
-            msg: 'No token provided in the request'
+            msg: 'No keyAccess provided in the request'
         });
     }
 
     try {
-        const user = await User.findOne({ keyAccess: token });
+        const user = await queryPool('SELECT * FROM users WHERE api_key = ?', [keyAccess]);
 
         if (!user) {
-            return res.status(401).json({
-                msg: 'Invalid token - user does not exist'
+            return res.status(400).json({
+                ok: false,
+                msj: 'The user does not exist'
             });
         }
 
@@ -25,7 +29,7 @@ const validateAccess = async (req = request, res = response, next) => {
     } catch (error) {
         console.log(error);
         return res.status(401).json({
-            msg: 'Invalid token'
+            msg: 'Invalid keyAccess'
         });
     }
 }

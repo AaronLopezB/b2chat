@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 
-const { validateItems } = require('../middlewares/validate-items');
+const { validateAccess } = require('../middlewares/validate-access');
 
 const {
     oauthToken,
@@ -12,7 +12,7 @@ const router = Router();
 
 router.post('/oauth', [
     check('keyAccess', 'The la key acces is required').isEmail(),
-    // validateItems
+    validateAccess,
 ], oauthToken);
 
 router.post('/register', [

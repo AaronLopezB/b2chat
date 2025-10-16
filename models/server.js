@@ -3,8 +3,8 @@ const http = require("http");
 
 const cors = require("cors");
 const helmet = require('helmet');
-const { pool } = require("../database/config");
-
+// const { pool } = require("../database/config");
+const { queryPool } = require('./conexion');
 class Server {
 
     constructor() {
@@ -22,7 +22,7 @@ class Server {
         }
 
         // Connect to database before applying middlewares/routes
-        this.conectDB();
+        // this.conectDB();
 
         // Helmet (security headers)
         this.helmet();
@@ -48,18 +48,13 @@ class Server {
         this.routes();
     }
 
-    async conectDB() {
-        let connection;
-        try {
-            connection = await pool.getConnection();
-            console.log('Database connected successfully');
-        } catch (error) {
-            console.error('Database connection failed:', error);
-            throw error;
-        } finally {
-            if (connection) connection.release();
-        }
-    }
+    // async conectDB() {
+    //     try {
+    //         await queryPool()
+    //     } catch (error) {
+
+    //     }
+    // }
 
     helmet() {
         this.app.use(

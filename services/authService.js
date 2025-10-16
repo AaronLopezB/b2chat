@@ -1,5 +1,7 @@
 const axios = require('axios');
 const qs = require('qs');
+const { queryPool } = require('../models/conexion');
+const { query } = require('express-validator');
 // const session = require('express-session');
 
 class authService {
@@ -30,7 +32,7 @@ class authService {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'Accept': 'application/json',
                     },
-                    timeout: 10000,
+                    // timeout: 10000,
                 }
             );
 
@@ -43,13 +45,21 @@ class authService {
                 tokenExpiresAt: new Date(tokenExpiry)
             }
 
-            const userUpdated = await User.findByIdAndUpdate(user, dataClient, { new: true });
+            const userUpdated = await queryPool('UPDATE users SET b2_token = ? WHERE id = ?', [dataClient.b2chatToken, user]);
+            // console.log(response, userUpdated.affectedRows);
 
-            return userUpdated;
+            return {
+                ok: true,
+                user: userUpdated.affectedRows,
+                token: response.data.access_token
+            };
 
         } catch (error) {
             console.log(error);
-            return error;
+            return {
+                ok: false,
+                error: error.message
+            };
 
         }
 
