@@ -1,6 +1,7 @@
 const { response, request } = require('express');
+const b2_server = require('../services/b2chatService');
 
-const { queryPool } = require('../models/conexion')
+const { queryPool } = require('../models/conexion');
 
 const validateAccess = async (req = request, res = response, next) => {
 
@@ -22,6 +23,15 @@ const validateAccess = async (req = request, res = response, next) => {
             });
         }
 
+
+        const check_token = await b2_server.validateToken(user[0].b2_token);
+        console.log(check_token, user[0].b2_token);
+        if (!check_token.ok) {
+            return res.status(401).json({
+                ok: false,
+                msg: 'Invalid B2 token'
+            });
+        }
         req.user = user;
 
         next();

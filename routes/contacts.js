@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { check } = require('express-validator');
+const { query } = require('express-validator');
 
 // controllers methods
 const {
@@ -13,9 +13,10 @@ const {
 
 // middlewares
 const { validateAccess } = require('../middlewares/validate-access');
+const { authLimiter } = require('../middlewares/rate-limiter');
 
 // helpers
-const { validateMobile, validateCustomAttributes } = require('../helpers/db-validator')
+const { validateMobile } = require('../helpers/db-validator')
 
 // Define routes
 const router = Router();
@@ -23,50 +24,53 @@ const router = Router();
 // Get contacts
 router.get('/',
     [
-        check('keyAccess', 'The keyAccess is required').not().isEmpty(),
-        validateAccess
+        query('keyAccess', 'The keyAccess is required').not().isEmpty(),
+
+        validateAccess,
+        authLimiter
     ], getContacts
 );
 
 // Create contact
 router.post('/created',
     [
-        check('keyAccess', 'The keyAccess is required').notEmpty(),
-        check('fullname', 'The fullname is required').notEmpty(),
-        check('mobile', 'The mobile is required').custom(validateMobile),
-        check('landline', 'The landline is required').optional(),
-        check('email', 'The email is required').isEmail(),
-        check('identification', 'The identification is required').optional().isInt(),
-        check('address', 'The address is required').optional(),
-        check('country', 'The country is required').optional(),
-        check('city', 'The city is required').optional(),
-        check('company', 'The state is required').optional(),
-        check('custom_attributes', 'The custom_attributes is required').custom(validateCustomAttributes).optional(),
-        check('custom_attributes.*.name', 'Each custom attribute must have a valid name').optional().isString().notEmpty(),
-        check('custom_attributes.*.value', 'Each custom attribute must have a valid value').optional().isString().notEmpty(),
-        validateAccess
+        query('keyAccess', 'The keyAccess is required').notEmpty(),
+        query('fullname', 'The fullname is required').notEmpty(),
+        query('mobile', 'The mobile is required').custom(validateMobile),
+        query('landline', 'The landline is required').optional(),
+        query('email', 'The email is required').isEmail(),
+        query('identification', 'The identification is required').optional().isInt(),
+        query('address', 'The address is required').optional(),
+        query('country', 'The country is required').optional(),
+        query('city', 'The city is required').optional(),
+        query('company', 'The state is required').optional(),
+        // query('custom_attributes', 'The custom_attributes is required').custom(validateCustomAttributes).optional(),
+        // query('custom_attributes.*.name', 'Each custom attribute must have a valid name').optional().isString().notEmpty(),
+        // query('custom_attributes.*.value', 'Each custom attribute must have a valid value').optional().isString().notEmpty(),
+        validateAccess, authLimiter
     ],
     createContact
 );
 
 // Update contact
-router.patch('/update/:id',
+router.patch('/update/:contact_id',
     [
-        check('keyAccess', 'The keyAccess is required').notEmpty(),
-        check('id', 'The id is required').isInt(),
-        check('fullname', 'The fullname is required').optional().notEmpty(),
-        check('mobile', 'The mobile is required').optional().custom(validateMobile),
-        check('landline', 'The landline is required').optional(),
-        check('email', 'The email is required').optional().isEmail(),
-        check('identification', 'The identification is required').optional().isInt(),
-        check('address', 'The address is required').optional(),
-        check('country', 'The country is required').optional(),
-        check('city', 'The city is required').optional(),
-        check('company', 'The state is required').optional(),
-        check('custom_attributes', 'The custom_attributes is required').custom(validateCustomAttributes).optional(),
-        check('custom_attributes.*.name', 'Each custom attribute must have a valid name').optional().isString().notEmpty(),
-        check('custom_attributes.*.value', 'Each custom attribute must have a valid value').optional().isString().notEmpty(),
-        validateAccess
+        query('keyAccess', 'The keyAccess is required').notEmpty(),
+        query('contact_id', 'The contact_id is required').isInt(),
+        query('fullname', 'The fullname is required').optional().notEmpty(),
+        query('mobile', 'The mobile is required').optional().custom(validateMobile),
+        query('landline', 'The landline is required').optional(),
+        query('email', 'The email is required').optional().isEmail(),
+        query('identification', 'The identification is required').optional().isInt(),
+        query('address', 'The address is required').optional(),
+        query('country', 'The country is required').optional(),
+        query('city', 'The city is required').optional(),
+        query('company', 'The state is required').optional(),
+        // query('custom_attributes', 'The custom_attributes is required').custom(validateCustomAttributes).optional(),
+        // query('custom_attributes.*.name', 'Each custom attribute must have a valid name').optional().isString().notEmpty(),
+        // query('custom_attributes.*.value', 'Each custom attribute must have a valid value').optional().isString().notEmpty(),
+        validateAccess, authLimiter
+
     ],
     updateContact
 );

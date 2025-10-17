@@ -35,7 +35,19 @@ const validateCustomAttributes = (customAttributes) => {
     return true;
 };
 
+const validateFilter = (filter) => {
+    const allowedFilters = ['name', 'email', 'mobile'];
+    if (allowedFilters.includes(filter)) {
+        return true;
+    }
+    else {
+        throw new Error(`Filter must be one of: ${allowedFilters.join(', ')}`);
+    }
+    // return true;
+}
+
 module.exports = {
     validateMobile,
-    validateCustomAttributes
+    validateCustomAttributes,
+    validateFilter
 }
