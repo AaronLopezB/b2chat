@@ -23,12 +23,12 @@ const validateAccess = async (req = request, res = response, next) => {
 
         const check_token = await b2_server.validateToken(keyAccess);
 
-        console.log(check_token);
+        console.log({ check_token: check_token, 'method': "middleware" });
 
         if (!check_token.ok) {
             // try to refresh token
             const loginData = await authService.getOAuthToken();
-            console.log(loginData);
+            console.log({ token: loginData, 'method': "middleware-refresh" });
 
             if (!loginData || !loginData.ok) {
                 return res.status(401).json({ ok: false, msg: 'Could not refresh B2 token' });

@@ -67,12 +67,12 @@ const getChats = async (req, res = response) => {
         };
 
         const b2_server = await B2ChatService.getChats(token, params);
-        // console.log(b2_server);
-        res.status(200).json({
-            ok: true,
-            chats: b2_server.data.chats,
-            msj: b2_server.data.message
-        });
+        console.log(b2_server);
+        // res.status(200).json({
+        //     ok: true,
+        //     chats: b2_server.data.chats,
+        //     msj: b2_server.data.message
+        // });
 
     } catch (error) {
         console.log(error);
