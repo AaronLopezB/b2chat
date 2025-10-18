@@ -13,7 +13,7 @@ class authService {
         // this.tokenExpiry = null;
     }
 
-    async getOAuthToken(user) {
+    async getOAuthToken() {
 
         try {
             const data = qs.stringify({
@@ -40,17 +40,18 @@ class authService {
             const expiresIn = response.data.expires_in || 3600; // Valor por defecto de 1 hora si no se proporciona
             const tokenExpiry = Date.now() + (expiresIn * 1000) - 60000; // Restar 1 minuto para mayor seguridad
 
-            const dataClient = {
-                b2chatToken: response.data.access_token,
-                tokenExpiresAt: new Date(tokenExpiry)
-            }
+            // const dataClient = {
+            //     b2chatToken: response.data.access_token,
+            //     tokenExpiresAt: new Date(tokenExpiry)
+            // }
 
-            const userUpdated = await queryPool('UPDATE users SET b2_token = ? WHERE id = ?', [dataClient.b2chatToken, user]);
+            // const userUpdated = await queryPool('UPDATE users SET b2_token = ? WHERE id = ?', [dataClient.b2chatToken, user]);
             // console.log(response, userUpdated.affectedRows);
+            console.log(response);
 
             return {
                 ok: true,
-                user: userUpdated.affectedRows,
+                // user: userUpdated.affectedRows,
                 token: response.data.access_token
             };
 

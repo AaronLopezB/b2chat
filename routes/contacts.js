@@ -24,9 +24,8 @@ const router = Router();
 // Get contacts
 router.get('/',
     [
-        query('keyAccess', 'The keyAccess is required').not().isEmpty(),
-
         validateAccess,
+        query('keyAccess', 'The keyAccess is required').not().isEmpty(),
         authLimiter
     ], getContacts
 );

@@ -51,7 +51,7 @@ class B2ChatService {
                 filter = 'name',
                 search = '',
                 limit = 10,
-                offset = 1,
+                // offset = 1,
                 order_dir = 'desc',
                 skip_custom_attributes = false,
                 skip_tags = false
@@ -60,7 +60,7 @@ class B2ChatService {
             const payload = {
                 filters: {
                     limit,
-                    offset,
+                    // offset,
                     create: { from, to },
                     order_dir,
                     skip_custom_attributes,
@@ -79,6 +79,8 @@ class B2ChatService {
                 timeout: 10000, // opcional: tiempo de espera en ms
                 data: JSON.stringify(payload)
             });
+
+            console.log(response);
 
             return { ok: true, data: response.data };
         } catch (error) {
@@ -277,15 +279,19 @@ class B2ChatService {
     async getChats(token, filters = {}) {
         try {
             const params = {
-                "contact_lookup": "John Wick", // filtro principal por id, nombre, móvil o email.
-                "messaging_type": "whatsapp", // puede ser "whatsapp", "facebook", "telegram ", "livechat ", "b2cbotapi" 
-                "date_range": { "from": "2020-01-01", "to": "2020-01-02" },
-                "agent_lookup": "Agent Carter", // filtra por el nombre del agente
-                // "chat_id": "2342342342-234234234-234234234",
-                "email_recipient": "recipient@mail.net", // para mandar el chat por email si son muchos solo se separan por comas
-                // "is_agent_available": true,
-                "limit": 1000
+                // ...filters,
+                contact_lookup: filters.contact_lookup,
+                // messaging_type: filters.messaging_type,
+                date_range: filters.date_range,
+                // agent_lookup: filters.agent_lookup ? filters.agent_lookup : '',
+                email_recipient: filters.email_recipient,
+                limit: 120,
+                offset: 100
             };
+            if (filters.agent_lookup !== '' && filters.agent_lookup !== null) {
+                params.agent_lookup = filters.agent_lookup;
+            }
+
             const response = await fetch(`${this.baseUrl}/chats/export`, {
                 method: 'GET',
                 headers: {
@@ -295,18 +301,47 @@ class B2ChatService {
                 params: JSON.stringify(params)
             });
 
+            const data = await response.json();
+
+            return {
+                ok: true,
+                data: data
+            };
+        } catch (error) {
+            // console.log({ 'method': 'getChats', 'error': error });
+            return error;
+        }
+    }
+
+    async sendMessage(token, messageData) {
+        try {
+            const response = await fetch(`${this.baseUrl}/broadcast`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(messageData)
+            });
+
             if (!response.ok) {
-                const statusCode = response.status;
+                const errorData = response.status;
+                console.log('Error en sendMessage:', errorData);
                 return {
                     ok: false,
-                    status: statusCode,
+                    error: errorData
                 };
             }
 
             const data = await response.json();
-            return { ok: true, data: data };
+            // console.log(data, response, messageData);
+
+            return {
+                ok: true,
+                data: data
+            };
         } catch (error) {
-            console.log({ 'method': 'getChats', 'error': error });
+            console.log({ 'method': 'sendMessage', 'error': error });
             return error;
         }
     }

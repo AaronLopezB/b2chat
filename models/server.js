@@ -20,7 +20,8 @@ class Server {
             auth: '/api/auth',
             contacts: '/api/contacts',
             tags: '/api/tags',
-            chat: '/api/chat'
+            chat: '/api/chat',
+            messages: '/api/messages'
         }
 
         // Connect to database before applying middlewares/routes
@@ -79,6 +80,7 @@ class Server {
         this.app.use(this.paths.contacts, require('../routes/contacts'));
         this.app.use(this.paths.tags, require('../routes/tags'));
         this.app.use(this.paths.chat, require('../routes/chat'));
+        this.app.use(this.paths.messages, require('../routes/messages'));
     }
 
     listen() {
