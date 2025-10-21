@@ -3,15 +3,19 @@ const http = require("http");
 
 const cors = require("cors");
 const helmet = require('helmet');
+
+const swaggerUi = require('swagger-ui-express');
+const postmanSpec = require('../config/swagger');
 // const { pool } = require("../database/config");
 const { queryPool } = require('./conexion');
+const path = require("path");
 class Server {
 
     constructor() {
         this.app = express();
         this.server = http.createServer(this.app);
 
-        this.port = process.env.PORT || 3000;
+        this.port = process.env.PORT || 4000;
         // Retry configuration for port conflicts
         this._portAttempts = 0;
         this._maxPortAttempts = 5;
@@ -30,12 +34,12 @@ class Server {
         // Helmet (security headers)
         this.helmet();
 
-        this.allowedOrigins = [
+        const allowedOrigins = [
             'http://localhost:4000'
         ];
         this.corsOptions = {
             origin: (origin, callback) => {
-                if (process.env.NODE_ENV === 'development' || !origin || this.allowedOrigins.includes(origin)) {
+                if (process.env.NODE_ENV === 'development' || !origin || allowedOrigins.includes(origin)) {
                     callback(null, true);
                 } else {
                     callback(new Error('Not allowed by CORS'));
@@ -76,6 +80,10 @@ class Server {
     }
 
     routes() {
+        const publicDir = path.join(__dirname, '../public');
+        this.app.use('/public', express.static(publicDir));
+        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(postmanSpec));
+
         this.app.use(this.paths.auth, require('../routes/auth'));
         this.app.use(this.paths.contacts, require('../routes/contacts'));
         this.app.use(this.paths.tags, require('../routes/tags'));

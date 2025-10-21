@@ -40,8 +40,8 @@ const getContacts = async (req, res = response) => {
         }
 
         // User from middleware
-        const token = req.token;
-        console.log(token);
+
+        const token = req.token.b2_token;
 
         if (!token) {
             return res.status(401).json({
@@ -61,7 +61,7 @@ const getContacts = async (req, res = response) => {
 
         return res.status(200).json({
             ok: true,
-            b2chatService: contacts
+            contacts: contacts.data
         });
     } catch (error) {
         console.error(error);
@@ -78,7 +78,7 @@ const createContact = async (req, res = response) => {
 
     try {
         // User is set in the request by the validateAccess middleware
-        const token = req.token;
+        const token = req.token.b2_token;
         // Here you would typically call a service to create the contact in B2Chat
         // For example:
         // const result = await B2ChatService.createContact(token, { fullname, email, mobile, landline, identification, address, country, city, company, custom_attributes }); 
@@ -95,26 +95,27 @@ const createContact = async (req, res = response) => {
             // custom_attributes
         }
         const b2_server = await B2ChatService.createContact(token, { ...data });
-        console.log(b2_server);
+
 
         if (!b2_server.ok) {
+            console.log(b2_server);
 
             return res.status(400).json({
                 ok: false,
                 msg: 'Error creating contact',
-                errors: b2_server.error
+                errors: b2_server.error.message
             });
         }
 
+        console.log(b2_server);
+
         res.status(200).json({
             ok: true,
-            b2_server: b2_server
+            data: b2_server.data.message || b2_server.data
         });
 
 
     } catch (error) {
-        console.log(error);
-
         res.status(500).json({
             ok: false,
             msg: 'talk to the admin'
@@ -128,7 +129,7 @@ const updateContact = async (req, res = response) => {
     try {
 
         // User is set in the request by the validateAccess middleware
-        const token = req.token;
+        const token = req.token.b2_token;
         // Here you would typically call a service to update the contact in B2Chat
         // For example:
         // const result = await B2ChatService.updateContact(token, id, { fullname, email, mobile, landline, identification, address, country, city, company, custom_attributes }); 
@@ -149,10 +150,27 @@ const updateContact = async (req, res = response) => {
 
         const b2_server = await B2ChatService.updateContact(token, contact_id, { ...data });
 
-        console.log(b2_server);
+        // console.log(b2_server);
+        if (!b2_server.ok) {
+
+            return res.status(b2_server.code).json({
+                ok: false,
+                msg: 'Error updating contact',
+                errors: b2_server.error
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            data: b2_server.data
+        });
 
     } catch (error) {
         console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'talk to the admin'
+        });
 
     }
 }

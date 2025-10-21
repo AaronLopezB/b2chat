@@ -2,8 +2,8 @@ const { response } = require('express');
 const B2ChatService = require('../services/b2chatService');
 
 const sendMessage = async (req, res = response) => {
-    const { from, to, template_name, campaign_name, header_url, values } = req.body;
-    const token = req.token;
+    const { from, to, template_name, campaign_name, header_url, values, broadcast_target } = req.body;
+    const token = req.token.b2_token;
     try {
         const phoneRegex = /^\+[1-9]\d{1,14}$/;
 
@@ -49,7 +49,8 @@ const sendMessage = async (req, res = response) => {
             "template_name": template_name,
             "campaign_name": campaign_name,
             "header_url": header_url,
-            "values": values
+            "values": values,
+            "broadcast_target": broadcast_target
         }
 
         const response = await B2ChatService.sendMessage(token, params);
@@ -70,6 +71,51 @@ const sendMessage = async (req, res = response) => {
     }
 }
 
+const sendMessageV2 = async (req, res = response) => {
+    // console.log('sendMessageV2 called');
+    const { from, to, template_name, campaign_name, header_url, values, broadcast_target } = req.body;
+    const token = req.token.b2_token;
+    try {
+
+        const messageData = {
+            from,
+            to,
+            template_name,
+            campaign_name,
+            header_url,
+            values,
+            broadcast_target
+        };
+
+        const response = await B2ChatService.sendMessageV2(token, messageData);
+
+        console.log({
+            "method": "controller send message v2",
+            "data": messageData,
+            "response": response
+        });
+
+        // if (!response.ok) {
+        //     return res.status(500).json({
+        //         ok: false,
+        //         msg: response.error
+
+
+        // if (!response.ok) {
+        //     return res.status(500).json({
+        //         ok: false,
+        //         msg: response.error
+        //     });
+        // }
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
 module.exports = {
-    sendMessage
+    sendMessage,
+    sendMessageV2
 };

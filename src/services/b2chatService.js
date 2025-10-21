@@ -53,11 +53,12 @@ class B2ChatService {
                 limit = 10,
                 // offset = 1,
                 order_dir = 'desc',
-                skip_custom_attributes = false,
+                skip_custom_attributes = true,
                 skip_tags = false
             } = filters;
 
             const payload = {
+
                 filters: {
                     limit,
                     // offset,
@@ -80,8 +81,6 @@ class B2ChatService {
                 data: JSON.stringify(payload)
             });
 
-            console.log(response);
-
             return { ok: true, data: response.data };
         } catch (error) {
             const errPayload = error?.response?.data ?? error?.message ?? error;
@@ -93,12 +92,6 @@ class B2ChatService {
     // Create contact
     async createContact(token, contactData) {
         try {
-            // console.log({
-            //     method: 'createContact',
-            //     token,
-            //     contactData
-            // });
-
             const params = {
                 skip_required_custom_attributes: true,
                 contact: {
@@ -130,7 +123,7 @@ class B2ChatService {
             return { ok: true, message: 'Contact created successfully', data: data };
         } catch (error) {
             console.log({ 'method': 'createContactService', 'error': error });
-            return error;
+            return { ok: false, error: error };
         }
     }
 
@@ -144,44 +137,49 @@ class B2ChatService {
                 }
             }
 
-            const response = await axios.patch(`${this.baseUrl}/contacts/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                data: JSON.stringify(params)
-            });
-            console.log(response);
-
-            // const response = await fetch(`${this.baseUrl}/contacts/${id}`, {
-            //     method: 'PATCH',
+            // const response = await axios.patch(`${this.baseUrl}/contacts/${id}`, {
             //     headers: {
             //         'Authorization': `Bearer ${token}`,
             //         'Content-Type': 'application/json',
             //     },
-            //     body: JSON.stringify(params)
+            //     data: JSON.stringify(params)
             // });
 
-            // if (!response.ok) {
-            //     const responseText = await response.json();
-            //     console.log({
-            //         'responseText': responseText, 'responseStatus': response.status, 'path': `${this.baseUrl}/contacts/${id}`
-            //     });
+            // console.log(response);
 
-            //     return {
-            //         ok: false,
-            //         error: responseText ?? `HTTP error! status: ${response.status}`
-            //     };
-            // }
+            const response = await fetch(`${this.baseUrl}/contacts/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(params)
+            });
+
+            if (!response.ok) {
+                const responseText = await response.json();
+                console.log({
+                    'responseText': responseText, 'responseStatus': response.status, 'path': `${this.baseUrl}/contacts/${id}`
+                });
+
+                return {
+                    ok: false,
+                    error: responseText.message == '' ? responseText.error : responseText.message,
+                    code: response.status
+                };
+            }
 
 
-            // const data = await response.json();
+            const data = await response.json();
             // console.log({ resolve: "response", data: data });
 
-            // return data;
+            return { ok: true, data: data };
         } catch (error) {
-            console.log({ 'method': 'updateContactService', 'error': error });
-            return error;
+            // console.log({ 'method': 'updateContactService', 'error': error });
+            return {
+                ok: false,
+                error: error
+            };
         }
     }
 
@@ -189,20 +187,7 @@ class B2ChatService {
     async createTag(token, tagData) {
         try {
 
-
-            // const response = await axios.post(`${this.baseUrl}/contacts/${tagData.contact_id}/tags?tag_actions=ASSIGN_TAG`, tagData.tags, {
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     },
-            //     params: JSON.stringify(tagData.tags)
-            // });
-
-            // console.log(response);
-            // return { ok: true, message: 'Tag created successfully', data: response.data };
-
-
-            const response = await fetch(`${this.baseUrl}/contacts/${tagData.contact_id}/tags?tag_actions=ASSIGN_TAG`, {
+            const response = await fetch(`${this.baseUrl}/contacts/${tagData.contact_id}/tags?tag_actions=SKIP_TAGS`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -213,17 +198,17 @@ class B2ChatService {
 
             if (!response.ok) {
                 const statusCode = response.status;
+                const responseText = await response.json();
+                console.log({
+                    'responseText': responseText, 'responseStatus': response.status, 'path': `${this.baseUrl}/contacts/${tagData.contact_id}/tags`
+                });
                 return {
                     ok: false,
                     status: statusCode,
                 };
             }
-            return { ok: true, status: response.status };
-            // console.log({ response, 'method': 'createTagService' });
-
-            // const data = await response.json();
-            // return { ok: true, message: 'Tag created successfully', data: data };
-            // console.log({ resolve: "response", data: data });
+            const data = await response.json();
+            return { ok: true, status: response.status, data: data };
 
         } catch (error) {
             console.log({ 'method': 'createTagService', 'error': error });
@@ -234,15 +219,6 @@ class B2ChatService {
     // Delete tag
     async deleteTag(token, tagData) {
         try {
-            // const tagNames = tagData.tags.map(tag => tag.name).join(','); // Convierte el arreglo de objetos en una cadena separada por comas
-
-            // const response = await axios.delete(`${this.baseUrl}/contacts/${tagData.contact_id}/tags`, {
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     },
-            //     params: JSON.stringify(tagData.tags)
-            // });
 
             const response = await fetch(`${this.baseUrl}/contacts/${tagData.contact_id}/tags`, {
                 method: 'DELETE',
@@ -253,17 +229,11 @@ class B2ChatService {
                 body: JSON.stringify(tagData.tags)
             });
             if (!response.ok) {
-                // let responseBody;
-                // try {
-                //     responseBody = await response.json();
-                // } catch (e) {
-                //     responseBody = await response.text();
-                // }
+
                 const statusCode = response.status;
                 return {
                     ok: false,
                     status: statusCode,
-                    // error: responseBody
                 };
             }
 
@@ -286,7 +256,7 @@ class B2ChatService {
                 // agent_lookup: filters.agent_lookup ? filters.agent_lookup : '',
                 email_recipient: filters.email_recipient,
                 limit: 120,
-                offset: 100
+                offset: 0
             };
             if (filters.agent_lookup !== '' && filters.agent_lookup !== null) {
                 params.agent_lookup = filters.agent_lookup;
@@ -325,8 +295,15 @@ class B2ChatService {
             });
 
             if (!response.ok) {
+                const statusCode = await response.json();
+
                 const errorData = response.status;
-                console.log('Error en sendMessage:', errorData);
+                console.log({
+                    "method": "service send message response error",
+                    "data": messageData,
+                    "error": statusCode,
+                    "code": response.status
+                });
                 return {
                     ok: false,
                     error: errorData
@@ -334,14 +311,66 @@ class B2ChatService {
             }
 
             const data = await response.json();
-            // console.log(data, response, messageData);
+            console.log({
+                "method": "service send message",
+                "data": messageData,
+                "response": data,
+                "code": response.status
+            });
 
             return {
                 ok: true,
                 data: data
             };
         } catch (error) {
-            console.log({ 'method': 'sendMessage', 'error': error });
+            console.log({ 'method': 'service send message error', 'error': error });
+            return error;
+        }
+    }
+
+    async sendMessageV2(token, messageData) {
+        try {
+
+            const response = await fetch(`${this.baseUrl}/v2/broadcast`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(messageData)
+            });
+
+            if (!response.ok) {
+                const statusCode = await response.json();
+
+                const errorData = response.status;
+                console.log({
+                    "method": "service send message v2 response error",
+                    "data": messageData,
+                    "error": statusCode,
+                    "type": "error"
+                });
+                return {
+                    ok: false,
+                    error: errorData
+                };
+            }
+
+            const data = await response.json();
+            console.log({
+                "method": "service send message v2",
+                "data": messageData,
+                "response": data,
+                "type": "info",
+                "code": response.status
+            });
+
+            return {
+                ok: true,
+                data: data
+            };
+        } catch (error) {
+            console.log({ 'method': "service send message v2 error promise", data: messageData, type: "error" });
             return error;
         }
     }

@@ -1,0 +1,304 @@
+{
+	"info": {
+		"_postman_id": "58007f5c-7ce8-4098-8618-6f9aadb568a7",
+		"name": "B2-chat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27591104"
+	},
+	"item": [
+		{
+			"name": "Contacts",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "6f245e98-1b3b-4c9f-9f0c-25eae5f7ea56",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullname\": \"Aaron Sistemas\",\r\n    \"mobile\": \"+527224268643\",\r\n    // \"landline\": \"2772233\",\r\n    \"email\": \"john.doe@mail.com\",\r\n    \"identification\": \"0123456789\",\r\n    \"address\": \"5th Avenue Building 123\",\r\n    \"country\": \"CO\",\r\n    \"city\": \"Medellín\",\r\n    \"company\": \"B2Chat\",\r\n    \"custom_attributes\": [\r\n      { \"name\": \"color\", \"value\": \"green\" },\r\n      { \"name\": \"department\", \"value\": \"support\" }\r\n    ]\r\n      \r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/contacts/created",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"contacts",
+								"created"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get contacts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-auth-key",
+								"value": "6f245e98-1b3b-4c9f-9f0c-25eae5f7ea56",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from\" :\"2025-10-15\",\r\n    \"to\":\"2025-10-17\",\r\n    \"filter\":\"mobile\", // los filtros aplicables son: name, email, mobile\r\n    \"search\":\"7224268643\" // si buscar por numero necesitas colocar unicamente el numero sin el codigo del pais\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/contacts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-auth-token",
+								"value": "6f245e98-1b3b-4c9f-9f0c-25eae5f7ea56",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullname\": \"Aaron Sistemas dev\",\r\n    // \"mobile\": \"+573002742062\"\r\n    // \"landline\": \"2772233\",\r\n    \"email\": \"aaron.lbenitez@travelviajesgroup.com\"\r\n    // \"identification\": \"0123456789\",\r\n    // \"address\": \"5th Avenue Building 123\",\r\n    // \"country\": \"CO\",\r\n    // \"city\": \"Medellín\",\r\n    // \"company\": \"B2Chat\",\r\n    // ,\"custom_attributes\": [\r\n    //   { \"name\": \"color\", \"value\": \"green\" },\r\n    //   { \"name\": \"department\", \"value\": \"support\" }\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/contacts/update/64064436",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"contacts",
+								"update",
+								"64064436"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "**End Points to generate contacts**\n\n- Create a new contact\n    \n    - params to generate in object: `{ \"fullname\": \"\", \"mobile\": \"+52....\",\"email\": \"mail@mail.com\", \"identification\": \"\", \"address\": \"\", \"country\": \"\", \"city\": \"\", \"company\": \"\", \"custom_attributes\": [ { \"name\": \"\", \"value\": \"\" },{ \"name\": \"\", \"value\": \"\" } ] }`\n        \n- Get all contacts and aply filters with: `{\"from\" :\"2025-10-15\", \"to\":\"2025-10-17\", \"filter\":\"mobile\", // los filtros aplicables son: name, email, mobile \"search\":\"7224268643\" // si buscar por numero necesitas colocar unicamente el numero sin el codigo del pais}`\n    \n- Update contact"
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "x-api-key",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/tags/create/64026066",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"tags",
+								"create",
+								"64026066"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "6f245e98-1b3b-4c9f-9f0c-25eae5f7ea56",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tags\":[\r\n        {\r\n        \"name\":\"test4\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/tags/delete/64026066",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"tags",
+								"delete",
+								"64026066"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "chat",
+			"item": [
+				{
+					"name": "chat",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "6f245e98-1b3b-4c9f-9f0c-25eae5f7ea56",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"contact_lookup\":\"test\",\r\n    \"from\":\"2025-10-15\",\r\n    \"to\":\"2025-10-16\",\r\n    \"agent_lookup\":\"\",\r\n    \"email_recipient\":\"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/chat/history",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Messages",
+			"item": [
+				{
+					"name": "send message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "6f245e98-1b3b-4c9f-9f0c-25eae5f7ea5",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from\":\"+5215552118668\", // requerido\r\n    \"to\":\"+5217224268643\", // requerido\r\n    \"template_name\":\"vta_sg_aviso_envio_cotizacion_email\", // requerido\r\n    \"campaign_name\":\"test\",\r\n    \"broadcast_target\":{\r\n        \"target\":\"AGENT\",\r\n        \"target_id\":\"6038\"\r\n    }\r\n    // \"header_url\":\"\",\r\n    // \"values\":[\r\n    //     \"\"\r\n    // ],\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/messages/send",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "send Messages v2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "6f245e98-1b3b-4c9f-9f0c-25eae5f7ea56",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from\":\"+5215552118668\", // requerido\r\n    \"to\":\"+5217224268643\", // requerido\r\n    \"template_name\":\"vta_rt_primer_contacto\", // requerido\r\n    \"campaign_name\":\"test\", // nombre del contacto\r\n    \"header_url\":\"\", // nullable\r\n    \"values\":[  // si el template tienen valores se colocan aca\r\n        \"\"\r\n    ],\r\n    \"broadcast_target\": {\r\n        \"target\":\"AGENT\", // acepta 2 tipos de filtros:  AGENT o DEPARTAMENT\r\n        \"target_id\":1 // id del agente o departamento \r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/messages/send/v2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"send",
+								"v2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

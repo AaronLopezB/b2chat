@@ -5,10 +5,10 @@ const B2ChatService = require('../services/b2chatService');
 const createTag = async (req, res = response) => {
     const { tags } = req.body || {};
     const { contact_id } = req.params || {};
-    const user = req.user && req.user;
+    const user = req.token.b2_token;
 
     try {
-        if (!user || !token) {
+        if (!user) {
             return res.status(401).json({
                 ok: false,
                 msg: 'Usuario no autenticado'
@@ -31,7 +31,9 @@ const createTag = async (req, res = response) => {
 
         const tagData = { tags: tags, contact_id: contact_id };
 
-        const tagResponse = await B2ChatService.createTag(token, tagData);
+        // console.log(tagData);
+
+        const tagResponse = await B2ChatService.createTag(user, tagData);
         res.status(200).json({
             ok: true,
             tagResponse

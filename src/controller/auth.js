@@ -10,7 +10,7 @@ const oauthToken = async (req, res = response) => {
 
     try {
         // User is set in the request by the validateAccess middleware
-        const token = req.token;
+        const token = req.token.b2_token;
 
         // Generate OAuth token using the authService
         const loginData = await authService.getOAuthToken(user.id);

@@ -1,4 +1,4 @@
-const { Router } = require('express');
+const { Router, request } = require('express');
 const { query } = require('express-validator');
 
 // controllers methods
@@ -14,6 +14,7 @@ const {
 // middlewares
 const { validateAccess } = require('../middlewares/validate-access');
 const { authLimiter } = require('../middlewares/rate-limiter');
+const { historyEvents } = require('../middlewares/history-events');
 
 // helpers
 const { validateMobile } = require('../helpers/db-validator')
@@ -26,7 +27,7 @@ router.get('/',
     [
         validateAccess,
         query('keyAccess', 'The keyAccess is required').not().isEmpty(),
-        authLimiter
+        authLimiter, historyEvents
     ], getContacts
 );
 
@@ -46,7 +47,7 @@ router.post('/created',
         // query('custom_attributes', 'The custom_attributes is required').custom(validateCustomAttributes).optional(),
         // query('custom_attributes.*.name', 'Each custom attribute must have a valid name').optional().isString().notEmpty(),
         // query('custom_attributes.*.value', 'Each custom attribute must have a valid value').optional().isString().notEmpty(),
-        validateAccess, authLimiter
+        validateAccess, authLimiter, historyEvents
     ],
     createContact
 );
@@ -68,7 +69,7 @@ router.patch('/update/:contact_id',
         // query('custom_attributes', 'The custom_attributes is required').custom(validateCustomAttributes).optional(),
         // query('custom_attributes.*.name', 'Each custom attribute must have a valid name').optional().isString().notEmpty(),
         // query('custom_attributes.*.value', 'Each custom attribute must have a valid value').optional().isString().notEmpty(),
-        validateAccess, authLimiter
+        validateAccess, authLimiter, historyEvents
 
     ],
     updateContact

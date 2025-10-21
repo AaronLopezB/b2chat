@@ -32,26 +32,12 @@ class authService {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'Accept': 'application/json',
                     },
-                    // timeout: 10000,
                 }
             );
 
-            // // Calcular la fecha de expiración del token (actual + duración en segundos)
-            const expiresIn = response.data.expires_in || 3600; // Valor por defecto de 1 hora si no se proporciona
-            const tokenExpiry = Date.now() + (expiresIn * 1000) - 60000; // Restar 1 minuto para mayor seguridad
-
-            // const dataClient = {
-            //     b2chatToken: response.data.access_token,
-            //     tokenExpiresAt: new Date(tokenExpiry)
-            // }
-
-            // const userUpdated = await queryPool('UPDATE users SET b2_token = ? WHERE id = ?', [dataClient.b2chatToken, user]);
-            // console.log(response, userUpdated.affectedRows);
-            console.log(response);
 
             return {
                 ok: true,
-                // user: userUpdated.affectedRows,
                 token: response.data.access_token
             };
 

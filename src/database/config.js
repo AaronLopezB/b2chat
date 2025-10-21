@@ -32,7 +32,7 @@ pool.on('connection', async (conn) => {
 });
 setInterval(async () => {
     try { const c = await pool.getConnection(); await c.ping(); c.release(); }
-    catch (e) { logger.warn('[DB] Ping falló', { error: e.code || e.message }); }
+    catch (e) { console.log('[DB] Ping falló', { error: e.code || e.message }); }
 }, 60_000);
 
 module.exports = { pool };
