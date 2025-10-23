@@ -1,10 +1,13 @@
 const axios = require('axios');
 const qs = require('qs');
+const config = require('../config/app');
+const { response } = require('express');
 
 class B2ChatService {
 
     constructor() {
-        this.baseUrl = process.env.B2CHAT_API_BASE_URL;
+        this.baseUrl = config.b2Chat.baseUrl;
+
     }
 
     // Validate token
@@ -187,7 +190,17 @@ class B2ChatService {
     async createTag(token, tagData) {
         try {
 
-            const response = await fetch(`${this.baseUrl}/contacts/${tagData.contact_id}/tags?tag_actions=SKIP_TAGS`, {
+            // 2 values: SKIP_TAGS, ASSIGN_TAG
+            /**
+             * tag_actions: "SKIP_TAGS"
+             *   - description: "Cuando un tag no es encontrado o no está en estado ACTIVO se ignora y no se asocia el tag al contacto."
+             *   - example: "SKIP_TAGS"
+             *  tag_actions: "ASSIGN_TAG"
+             *   - description: "Si un tag no es encontrado se crea el tag y se asocia el tag al contacto, en caso de estár inactivo solo se debe asociar al contacto."
+             *   - example: "ASSIGN_TAG"
+             */
+
+            const response = await fetch(`${this.baseUrl}/contacts/${tagData.contact_id}/tags?tag_actions=ASSIGN_TAG`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -205,14 +218,19 @@ class B2ChatService {
                 return {
                     ok: false,
                     status: statusCode,
+                    message: responseText
                 };
             }
-            const data = await response.json();
-            return { ok: true, status: response.status, data: data };
+            // const data = await response.json();
+            return { ok: true, status: response.status, message: 'Tag created successfully' };
 
         } catch (error) {
             console.log({ 'method': 'createTagService', 'error': error });
-            return error;
+            return {
+                ok: false,
+                message: error,
+                status: 500
+            };
         }
     }
 
@@ -233,6 +251,7 @@ class B2ChatService {
                 const statusCode = response.status;
                 return {
                     ok: false,
+                    message: 'Error deleting tag',
                     status: statusCode,
                 };
             }
@@ -240,8 +259,12 @@ class B2ChatService {
             return { ok: true, message: 'Tag deleted successfully', status: response.status };
 
         } catch (error) {
-            console.log(error);
-            return error;
+
+            return {
+                ok: false,
+                message: error,
+                status: 500
+            };
         }
     }
 
@@ -271,15 +294,31 @@ class B2ChatService {
                 params: JSON.stringify(params)
             });
 
+            if (!response.ok) {
+                const status = response.status;
+                const responseText = await response.json();
+                return {
+                    ok: false,
+                    // message: 'Error getting chats',
+                    status: status,
+                    data: responseText
+                }
+            }
+
             const data = await response.json();
 
             return {
                 ok: true,
-                data: data
+                data: data,
+                status: response.status
             };
         } catch (error) {
             // console.log({ 'method': 'getChats', 'error': error });
-            return error;
+            return {
+                ok: false,
+                message: error,
+                status: 500
+            };
         }
     }
 
@@ -298,33 +337,31 @@ class B2ChatService {
                 const statusCode = await response.json();
 
                 const errorData = response.status;
-                console.log({
-                    "method": "service send message response error",
-                    "data": messageData,
-                    "error": statusCode,
-                    "code": response.status
-                });
+
                 return {
                     ok: false,
-                    error: errorData
+                    response: statusCode,
+                    message: "Error sending Message",
+                    code: errorData
                 };
             }
 
             const data = await response.json();
-            console.log({
-                "method": "service send message",
-                "data": messageData,
-                "response": data,
-                "code": response.status
-            });
 
             return {
                 ok: true,
-                data: data
+                response: data,
+                code: response.status,
+                message: "Message sent successfully"
             };
         } catch (error) {
-            console.log({ 'method': 'service send message error', 'error': error });
-            return error;
+            // console.log({ 'method': 'service send message error', 'error': error });
+            return {
+                ok: false,
+                message: "Error sending Message",
+                response: error,
+                code: 500
+            };
         }
     }
 
@@ -344,34 +381,30 @@ class B2ChatService {
                 const statusCode = await response.json();
 
                 const errorData = response.status;
-                console.log({
-                    "method": "service send message v2 response error",
-                    "data": messageData,
-                    "error": statusCode,
-                    "type": "error"
-                });
+
                 return {
                     ok: false,
-                    error: errorData
+                    response: statusCode,
+                    message: "Error sending Message",
+                    code: errorData
                 };
             }
 
             const data = await response.json();
-            console.log({
-                "method": "service send message v2",
-                "data": messageData,
-                "response": data,
-                "type": "info",
-                "code": response.status
-            });
 
             return {
                 ok: true,
-                data: data
+                response: data,
+                code: response.status,
+                message: "Message sent successfully"
             };
         } catch (error) {
-            console.log({ 'method': "service send message v2 error promise", data: messageData, type: "error" });
-            return error;
+            return {
+                ok: false,
+                message: "Error sending Message",
+                response: error,
+                code: 500
+            };
         }
     }
 

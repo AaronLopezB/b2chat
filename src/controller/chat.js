@@ -16,12 +16,12 @@ const getChats = async (req, res = response) => {
     try {
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-        if (contact_lookup !== '' && !contact_lookup) {
-            return res.status(400).json({
-                ok: false,
-                msg: 'Missing contact_lookup'
-            });
-        }
+        // if (contact_lookup !== '' && !contact_lookup) {
+        //     return res.status(400).json({
+        //         ok: false,
+        //         msg: 'Missing contact_lookup'
+        //     });
+        // }
         if ((from !== undefined && to === undefined) || (to !== undefined && from === undefined)) {
             return res.status(400).json({
                 ok: false,
@@ -67,8 +67,8 @@ const getChats = async (req, res = response) => {
         };
 
         const b2_server = await B2ChatService.getChats(token, params);
-        res.status(200).json({
-            ok: true,
+        res.status(b2_server.status).json({
+            ok: b2_server.ok,
             chats: b2_server.data.chats,
             msj: b2_server.data.message
         });

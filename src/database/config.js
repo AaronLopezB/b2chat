@@ -1,13 +1,14 @@
 const mysql = require('mysql2/promise'); // Corrección aquí
+const config = require('../config/app');
 
 const pool = mysql.createPool({
-    host: process.env.DATABASE_HOST,
-    port: Number(process.env.DATABASE_PORT || 3306),
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASS,
-    database: process.env.DATABASE_NAME,
+    host: config.database.host,
+    port: Number(config.database.port || 3306),
+    user: config.database.user,
+    password: config.database.password,
+    database: config.database.name,
     waitForConnections: true,
-    connectionLimit: Number(process.env.DATABASE_CONN_LIMIT || 10),
+    connectionLimit: Number(config.database.limit || 10),
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,

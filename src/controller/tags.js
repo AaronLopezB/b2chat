@@ -34,9 +34,9 @@ const createTag = async (req, res = response) => {
         // console.log(tagData);
 
         const tagResponse = await B2ChatService.createTag(user, tagData);
-        res.status(200).json({
-            ok: true,
-            tagResponse
+        res.status(tagResponse.status).json({
+            ok: tagResponse.ok,
+            response: tagResponse.message
         });
 
 
@@ -52,10 +52,10 @@ const createTag = async (req, res = response) => {
 const deleteTag = async (req, res = response) => {
     const { tags } = req.body || {};
     const { contact_id } = req.params || {};
-    const user = req.user && req.user;
+    const user = req.token.b2_token;
     try {
 
-        if (!user || !token) {
+        if (!user) {
             return res.status(401).json({
                 ok: false,
                 msg: 'Usuario no autenticado'
@@ -75,13 +75,13 @@ const deleteTag = async (req, res = response) => {
         }
         const tagData = { tags: tags, contact_id: contact_id };
 
-        const tagResponse = await B2ChatService.deleteTag(token, tagData);
-        res.status(200).json({
-            ok: true,
-            tagResponse
+        const tagResponse = await B2ChatService.deleteTag(user, tagData);
+
+        res.status(tagResponse.status).json({
+            ok: tagResponse.ok,
+            response: tagResponse.message
         });
     } catch (error) {
-        console.log(error);
         res.status(500).json({
             ok: false,
             msg: 'talk to the admin'

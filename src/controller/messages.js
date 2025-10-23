@@ -55,18 +55,16 @@ const sendMessage = async (req, res = response) => {
 
         const response = await B2ChatService.sendMessage(token, params);
 
-        if (!response.ok) {
-            return res.status(500).json({
-                ok: false,
-                msg: response.error
-            });
-        }
-
-        res.status(200).json(response);
-        // const result = await B2ChatService.sendMessage(req.user.token, params);
-        // return res.json(result);
+        res.status(response.code).json({
+            ok: response.ok,
+            response: response.response,
+            message: response.message
+        });
     } catch (error) {
-        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'talk to the admin'
+        });
 
     }
 }
@@ -89,28 +87,17 @@ const sendMessageV2 = async (req, res = response) => {
 
         const response = await B2ChatService.sendMessageV2(token, messageData);
 
-        console.log({
-            "method": "controller send message v2",
-            "data": messageData,
-            "response": response
+        res.status(response.code).json({
+            ok: response.ok,
+            response: response.response,
+            message: response.message
         });
 
-        // if (!response.ok) {
-        //     return res.status(500).json({
-        //         ok: false,
-        //         msg: response.error
-
-
-        // if (!response.ok) {
-        //     return res.status(500).json({
-        //         ok: false,
-        //         msg: response.error
-        //     });
-        // }
-
-        res.status(200).json(response);
     } catch (error) {
-        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'talk to the admin'
+        });
 
     }
 }

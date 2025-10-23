@@ -4,7 +4,7 @@ const B2ChatService = require('../services/b2chatService');
 const getContacts = async (req, res = response) => {
     const { from, to, filter, search } = req.body || {};
     try {
-        const allowedFilters = ['name', 'email', 'mobile'];
+        const allowedFilters = ['id', 'name', 'email', 'mobile'];
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
         // Validate filter

@@ -22,10 +22,12 @@ class Server {
 
         this.paths = {
             auth: '/api/auth',
-            contacts: '/api/contacts',
-            tags: '/api/tags',
-            chat: '/api/chat',
-            messages: '/api/messages'
+            contacts: '/api/b2/contacts',
+            tags: '/api/b2/tags',
+            chat: '/api/b2/chat',
+            messages: '/api/b2/messages',
+            voice_api: '/api/voice',
+            scheduled_calls: '/api/scheduled-calls'
         }
 
         // Connect to database before applying middlewares/routes
@@ -53,6 +55,9 @@ class Server {
 
         //Rutas de mi aplicacion
         this.routes();
+
+        // Inicializar cron jobs
+        this.initCronJobs();
     }
 
     // async conectDB() {
@@ -80,15 +85,21 @@ class Server {
     }
 
     routes() {
+        // Static files and API docs
         const publicDir = path.join(__dirname, '../public');
         this.app.use('/public', express.static(publicDir));
         this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(postmanSpec));
 
+        // b2Chat routes
         this.app.use(this.paths.auth, require('../routes/auth'));
         this.app.use(this.paths.contacts, require('../routes/contacts'));
         this.app.use(this.paths.tags, require('../routes/tags'));
         this.app.use(this.paths.chat, require('../routes/chat'));
         this.app.use(this.paths.messages, require('../routes/messages'));
+        // Voice API route
+        this.app.use(this.paths.voice_api, require('../routes/voice'));
+        // Scheduled calls route
+        this.app.use(this.paths.scheduled_calls, require('../routes/scheduledCalls'));
     }
 
     listen() {
@@ -120,6 +131,16 @@ class Server {
 
         // Start listening on configured port
         startServer(this.port);
+    }
+
+    initCronJobs() {
+        // Inicializar cron jobs para llamadas programadas
+        const voiceCronJobs = require('../jobs/voiceCronJobs');
+
+        // Retrasar la inicialización 5 segundos para que el servidor esté completamente listo
+        setTimeout(() => {
+            voiceCronJobs.start();
+        }, 5000);
     }
 }
 

@@ -2,15 +2,15 @@ const axios = require('axios');
 const qs = require('qs');
 const { queryPool } = require('../models/conexion');
 const { query } = require('express-validator');
+const config = require('../config/app');
 // const session = require('express-session');
 
 class authService {
     constructor() {
-        this.apiclient = process.env.B2CHAT_API_BASE_URL;
-        this.apiclientuser = process.env.B2CHAT_API_USER;
-        this.apiclientpassword = process.env.B2CHAT_API_PASSWORD;
-        // this.accesstoken = null;
-        // this.tokenExpiry = null;
+        this.apiclient = config.b2Chat.baseUrl;
+        this.apiclientuser = config.b2Chat.user;
+        this.apiclientpassword = config.b2Chat.password;
+
     }
 
     async getOAuthToken() {
@@ -80,7 +80,5 @@ class authService {
         return this.clientId && this.clientSecret;
     }
 }
-
-
 
 module.exports = new authService;

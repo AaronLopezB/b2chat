@@ -1,16 +1,17 @@
 const { response } = require('express');
 const authService = require('../services/authService');
+const ApiVoiceService = require('../services/api-voice');
 const { queryPool } = require('../models/conexion');
+const { token } = require('morgan');
 
 
 // const { use } = require('../routes/auth');
 
 const oauthToken = async (req, res = response) => {
-
+    const keyAccess = req.body?.keyAccess || req.headers['x-api-key'] || req.query?.keyAccess;
 
     try {
         // User is set in the request by the validateAccess middleware
-        const token = req.token.b2_token;
 
         // Generate OAuth token using the authService
         const loginData = await authService.getOAuthToken(user.id);
@@ -66,6 +67,32 @@ const registerUser = async (req, res = response) => {
 }
 
 
+const loginVoice = async (req, res = response) => {
+
+    try {
+        const loginApiVoice = await ApiVoiceService.logIn();
+
+        if (!loginApiVoice.ok) {
+            return res.status(loginApiVoice.code || 500).json({ ok: false, error: loginApiVoice.error });
+        }
+
+        return res.status(loginApiVoice.code).json({
+            ok: true,
+            message: loginApiVoice.result.message,
+            token: loginApiVoice.result.data.token
+        });
+
+    } catch (error) {
+        console.log({
+            'method': "login auth voice",
+            "error": error
+        });
+
+        return res.status(500).json({ ok: false, error: 'Internal server error' });
+
+    }
+}
+
 module.exports = {
-    oauthToken, registerUser
+    oauthToken, registerUser, loginVoice
 }
